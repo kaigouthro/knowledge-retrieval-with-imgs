@@ -55,10 +55,7 @@ def scrape_website(url: str):
         data_str = result.decode('utf-8')
         data_dict = json.loads(data_str)
 
-        # Extract the HTML content from the dictionary
-        html_string = data_dict['data'][0]['results'][0]['html']
-
-        return html_string
+        return data_dict['data'][0]['results'][0]['html']
     else:
         print(f"HTTP request failed with status code {response.status_code}")
 
@@ -73,10 +70,7 @@ def convert_html_to_markdown(html):
     # Configure the converter
     converter.ignore_links = False
 
-    # Convert the HTML to Markdown
-    markdown = converter.handle(html)
-
-    return markdown
+    return converter.handle(html)
 
 
 # Turn https://developers.webflow.com/docs/getting-started-with-apps to https://developers.webflow.com
@@ -84,8 +78,7 @@ def convert_html_to_markdown(html):
 def get_base_url(url):
     parsed_url = urlparse(url)
 
-    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    return base_url
+    return f"{parsed_url.scheme}://{parsed_url.netloc}"
 
 
 # Turn relative url to absolute url in html
@@ -114,18 +107,14 @@ def convert_to_absolute_url(html, base_url):
         absolute_url = urljoin(base_url, href)
         link_tag['href'] = absolute_url
 
-    updated_html = str(soup)
-
-    return updated_html
+    return str(soup)
 
 
 def get_markdown_from_url(url):
     base_url = get_base_url(url)
     html = scrape_website(url)
     updated_html = convert_to_absolute_url(html, base_url)
-    markdown = convert_html_to_markdown(updated_html)
-
-    return markdown
+    return convert_html_to_markdown(updated_html)
 
 
 # 3. Create vector index from markdown
